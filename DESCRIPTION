@@ -1,11 +1,12 @@
 Package: jjmisc
 Title: Various Functions to Aid Report Creation
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Jim", "Java", email = "priscian@gmail.com", role = c("aut", "cre"))
-Description: These are various functions I've created to help me conduct
-    analyses and create reports from them.
-Depends:
-    R (>= 3.4.0)
+Description: These are various functions I've created to help me conduct analyses and create reports from them.
+Depends: R (>= 3.2.0), lubridate, tools, ggplot2, Hmisc, devEMF, stringr
+Imports: gdata, gtools, pryr
+Suggests: knitr, testthat
+VignetteBuilder: knitr
 License: Artistic-2.0
 LazyData: true
 RoxygenNote: 5.0.1

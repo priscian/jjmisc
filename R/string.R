@@ -11,8 +11,55 @@
 #' @seealso \code{\link[base]{paste}}
 #'
 #' @examples
-#' who = "world"
+#' who <- "world"
 #' "Hello " %_% who %_% "!"
 #'
 #' @export
-`%_%` = function(a, b, sep='') paste(a, b, sep=sep)
+`%_%` <- function(a, b, sep='') paste(a, b, sep=sep)
+
+
+# ?base::tolower
+#' @export
+capwords <- function(s, strict = FALSE) {
+  cap <- function(s) paste(toupper(substring(s, 1L, 1L)), { s <- substring(s, 2L); if(strict) tolower(s) else s }, sep='', collapse=' ')
+  sapply(strsplit(s, split=' '), cap, USE.NAMES=!is.null(names(s)))
+}
+
+
+#' @export
+catn <- function (..., prefix="\n", suffix="\n\n", file="", sep="", fill=FALSE, labels=NULL, append=FALSE)
+{
+  cat(prefix, ..., suffix, file=file, sep=sep, fill=fill, labels=labels, append=append)
+}
+
+
+# http://stackoverflow.com/questions/28248457/gsub-in-r-with-unicode-replacement-give-different-results-under-windows-compared
+#' @export
+tru_unicode <- function(x) {
+  packuni <- Vectorize(function(cp) {
+    bv <- intToBits(cp)
+    maxbit <- tail(which(bv != as.raw(0L)), 1L)
+    if(maxbit < 8L)
+      rawToChar(as.raw(codepoint))
+    else if (maxbit < 12L)
+      rawToChar(rev(packBits(c(bv[1L:6L], as.raw(c(0L, 1L)), bv[7L:11L], as.raw(c(0L, 1L, 1L))), "raw")))
+    else if (maxbit < 17L)
+      rawToChar(rev(packBits(c(bv[1L:6L], as.raw(c(0L, 1L)), bv[7L:12L], as.raw(c(0L, 1L)), bv[13L:16L], as.raw(c(0L, 1L, 1L, 1L))), "raw")))
+    else
+      stop("Too many bits.")
+  })
+
+  m <- gregexpr("<U\\+[0-9a-fA-F]{4}>", x)
+  codes <- regmatches(x,m)
+  chars <- lapply(codes, function(x) {
+    codepoints <- strtoi(paste0("0x", substring(x, 4L, 7L)))
+    packuni(codepoints)
+  })
+  regmatches(x, m) <- chars
+  Encoding(x) <- "UTF-8"
+
+  return (x)
+}
+
+#' @export
+tu <- tru_unicode

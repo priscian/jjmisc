@@ -1,0 +1,26 @@
+## Do '%in%' match but return NA's for missing values of 'x'.
+#' @export
+"%eq%" <- function (x, table)
+{
+  #out <- match(x, table, nomatch = 0) > 0
+  out <- x %in% table
+  out[is.na(x)] <- NA
+
+  return (out)
+}
+
+## usage:
+# c(NA, "frog", NA, "toad", "cat", "apple") %in% c("frog", "fish", NA, "buffalo")
+# c(NA, "frog", NA, "toad", "cat", "apple") %eq% c("frog", "fish", NA, "buffalo")
+# match(x=c(NA, "frog", NA, "toad", "cat", "apple"), table=c("frog", "fish", NA, "buffalo"), nomatch=NA_integer_)
+# output:
+#   [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE
+#   [1]    NA  TRUE    NA FALSE FALSE FALSE
+#   [1]  3  1  3 NA NA NA
+
+
+#' @export
+"%neq%" <- function(x, ...)
+{
+  return (!`%eq%`(x, ...))
+}

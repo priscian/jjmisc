@@ -4,28 +4,31 @@
 \alias{get_dots}
 \title{Resolve Triple-Dot (...) Argument inside Function Body}
 \usage{
-get_dots(...)
+get_dots(..., evaluate = FALSE)
 }
 \arguments{
 \item{...}{A \code{...} argument composed of all non-formal arguments of a function call, where \code{...} must be a formal parameter of the function.}
+
+\item{evaluate}{Logical: return \code{...} object not only as a list of symbols, but also a list of those symbols expanded by \code{eval()}.}
 }
 \value{
 A list of objects mostly related to the non-formal arguments of a function call:
   \item{calling_function}{The name (if available) of the calling function.}
   \item{current_function}{The name (if available) of the current function.}
   \item{current_formals}{A character vector of the names of the formal parameters of the current function.}
-  \item{expanded}{A list of objects contained in \code{...}, with named elements for named arguments.}
+  \item{arguments}{A list of objects, as symbols, contained in \code{...}, with named elements for named arguments.}
+  \item{evaluated}{A list of objects contained in \code{...}, with named elements for named arguments.}
   \item{as_character}{The objects contained in \code{...} coerced into a character vector, with named elements for named arguments.}
-  \item{named_dots}{The names of the arguments contained in \code{...}, with null strings for unnamed arguments.}
-  \item{named_args}{All named arguments of the function call, including formal arguments.}
+  \item{named_dots}{The names of the arguments contained in \code{...}, with blank strings for unnamed arguments.}
+  \item{all_named_args}{All named arguments of the function call, including formal arguments.}
 }
 \description{
 Breaks up a triple-dot (\code{...}) argument of a function call into more accessible objects.
 }
 \examples{
-x = function(a, b, ...) browser()
-x(a=666, fish="trout", frog=10, bob=3.14, T, "ouch", F)
-dots = get_dots(...)
+x <- function(a, b, ...) browser()
+x(a=666, fish="trout", frog=10, bob=3.14, TRUE, "ouch", FALSE)
+dots <- get_dots(...)
 dots
 
 }

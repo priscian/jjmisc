@@ -20,7 +20,7 @@ The concatenation of \code{a} and \code{b}.
 Allows quick chaining together of character strings.
 }
 \examples{
-who = "world"
+who <- "world"
 "Hello " \%_\% who \%_\% "!"
 
 }
