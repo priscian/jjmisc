@@ -25,8 +25,8 @@ brewer_pal_recycle <- function (type="seq", palette=1L, direction=1L)
   }
 }
 
-
-.latex_plot_counter <- 1L
+## N.B. This is assigned in "zzz.R". I might want to create an 'environment()' here for package variables instead.
+#.latex_plot_counter <- 1L
 
 #' @export
 get_latex_plot_counter <- function()
