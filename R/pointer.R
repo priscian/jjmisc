@@ -119,8 +119,10 @@ print.pointer <- function(x, ...)
 
 ## usage:
 # x <- list(frog="frog", fish="~frog")
+# y <- x
 # z <- pointer(x)
 # ..(z)
 # ..(z)$fish <- "trout"
 # ..(z)
 # x
+# y

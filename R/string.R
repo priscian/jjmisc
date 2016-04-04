@@ -35,7 +35,7 @@ catn <- function (..., prefix="\n", suffix="\n\n", file="", sep="", fill=FALSE, 
 
 # http://stackoverflow.com/questions/28248457/gsub-in-r-with-unicode-replacement-give-different-results-under-windows-compared
 #' @export
-tru_unicode <- function(x) {
+true_unicode <- function(x) {
   packuni <- Vectorize(function(cp) {
     bv <- intToBits(cp)
     maxbit <- tail(which(bv != as.raw(0L)), 1L)
@@ -62,4 +62,4 @@ tru_unicode <- function(x) {
 }
 
 #' @export
-tu <- tru_unicode
+tu <- true_unicode
