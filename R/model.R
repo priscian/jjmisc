@@ -8,13 +8,13 @@ split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
   rePlusMinus <- ifelse(is.null(re_plus_minus), "\\s+(\\+|-)\\s+", re_plus_minus)
   exes <- tail(as.character(x), 1L)
   right <- exes
-  operatorIndices <- gregexpr(re, exes, perl=TRUE)[[1L]]
+  operatorIndices <- gregexpr(rePlusMinus, exes, perl=TRUE)[[1L]]
   operatorLengths <- attr(operatorIndices, "match.length")
   operators <- NULL
   for (i in seq_along(operatorIndices))
     operators <- c(operators, substr(exes, operatorIndices[i], operatorIndices[i] + operatorLengths[i] - 1L))
   operators <- operators[operators != ""]
-  exes <- trimws(strsplit(exes, re, perl=TRUE)[[1L]])
+  exes <- trimws(strsplit(exes, rePlusMinus, perl=TRUE)[[1L]])
   exes <- exes[exes != ""]
   if (length(operators) < length(exes))
     operators <- c("+", operators)
