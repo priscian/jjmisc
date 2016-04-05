@@ -33,7 +33,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
   split_f <- split(f)
 
-  independent <- attr(split_f$terms, "term.labels")
+  independent <- all.vars(as.formula("~" %_% split_f$right_side))
   for (i in independent) {
     if (exists(i, envir=envir)) {
       .v <- get(i, envir=envir)
@@ -42,7 +42,8 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
   ## Use subset if dependent variable has missing observations.
   dependent <- split_f$left_side
-  if (!is.null(dependent)) {
+  if (!is_invalid(dependent)) {
+    dependent <- all.vars(as.formula("~" %_% split_f$left_side))[1L]
     if (any(!complete.cases(..(p)[[dependent]])))
       subset <- complete.cases(..(p)[[dependent]]) & subset
   }
