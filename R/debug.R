@@ -48,3 +48,10 @@ untrace_package <- function(...)
 {
   trace_package(..., untrace=TRUE)
 }
+
+
+#' @export
+stop_no_error = function(message="Not an error.", ...)
+{
+  stop(message, ...)
+}

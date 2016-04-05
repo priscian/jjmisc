@@ -1,11 +1,11 @@
 #' @export
-split.formula <- function(x, ...)
+split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
 {
   variables <- tail(as.character(attr(terms(x), "variables")), -1L)
   responseIndex <- attr(terms(x), "response")
   hasIntercept <- as.logical(attr(terms(x), "intercept"))
 
-  re <- "\\+|-"
+  rePlusMinus <- ifelse(is.null(re_plus_minus), "\\s+(\\+|-)\\s+", re_plus_minus)
   exes <- tail(as.character(x), 1L)
   right <- exes
   operatorIndices <- gregexpr(re, exes, perl=TRUE)[[1L]]
@@ -16,10 +16,20 @@ split.formula <- function(x, ...)
   operators <- operators[operators != ""]
   exes <- trimws(strsplit(exes, re, perl=TRUE)[[1L]])
   exes <- exes[exes != ""]
-  if (length(operators) < length(exes)) operators <- c("+", operators)
+  if (length(operators) < length(exes))
+    operators <- c("+", operators)
 
   left <- NULL; independents <- exes
-  if (responseIndex != 0L) left <- variables[responseIndex];
+  if (responseIndex != 0L)
+    left <- variables[responseIndex];
+
+  ## 'update.formula()' sometimes parenthesizes backquoted variables; remove those parentheses.
+  if (remove_extra_parens) {
+    reRemoveParens <- "(?:^|\\s+)\\((`.+?`)\\)(?:\\s+|$)"
+    independents <- gsub(reRemoveParens, "\\1", independents)
+    left <- gsub(reRemoveParens, "\\1", left)
+    right <- gsub(reRemoveParens, "\\1", right)
+  }
 
   characters <- left %_% " ~ " %_% right
 
@@ -32,7 +42,7 @@ split.formula <- function(x, ...)
     variables = variables,
     all_vars = all.vars(x),
     intercept = hasIntercept,
-    term_labels=attr(terms(x), "term.labels")
+    terms = terms(x)
   )
 
   return (rv)
