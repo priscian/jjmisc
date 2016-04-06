@@ -2,8 +2,6 @@
 split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
 {
   variables <- tail(as.character(attr(terms(x), "variables")), -1L)
-  responseIndex <- attr(terms(x), "response")
-  hasIntercept <- as.logical(attr(terms(x), "intercept"))
 
   rePlusMinus <- ifelse(is.null(re_plus_minus), "\\s+(\\+|-)\\s+", re_plus_minus)
   exes <- tail(as.character(x), 1L)
@@ -37,11 +35,12 @@ split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
     left_side = left,
     right_side = right,
     as_character = characters,
-    independent = independents,
+    independent_terms = independents,
     operators = operators,
-    variables = variables,
+    #variables = variables,
     all_vars = all.vars(x),
-    intercept = hasIntercept,
+    has_intercept = attr(terms(x), "intercept") == 1,
+    has_response = attr(terms(x), "response") == 1
     terms = terms(x)
   )
 

@@ -33,10 +33,11 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
   split_f <- split(f)
 
+  ## What is this for? 'v_' doesn't seem to be used for anything.
   independent <- all.vars(as.formula("~" %_% split_f$right_side))
   for (i in independent) {
     if (exists(i, envir=envir)) {
-      .v <- get(i, envir=envir)
+      v_ <- get(i, envir=envir)
     }
   }
 
@@ -60,14 +61,14 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
   )
   summaryFormulaArgs = modifyList(summaryFormulaArgs, summary...)
 
-  .s <- try(do.call("summary", summaryFormulaArgs), silent=!verbose)
+  s_ <- try(do.call("summary", summaryFormulaArgs), silent=!verbose)
 
-  if (inherits(.s, "try-error"))
+  if (inherits(s_, "try-error"))
     return (NULL)
   else {
     if (!latex) {
       printSummaryFormulaArgs = list(
-        x = .s,
+        x = s_,
         long = TRUE,
         digits = digits,
         exclude1 = exclude1
@@ -81,7 +82,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
     }
     else {
       latexArgs = list(
-        object = .s,
+        object = s_,
         file = "",
         booktabs = TRUE,
         ctable = FALSE,
@@ -156,8 +157,11 @@ subset_plus <- function(x, subpart, exclusions, inclusions, ...)
 
 ## Streamline use of 'subset_plus()' a little.
 #' @export
-spp <- function(x, y, subpart, ..., envir=globalenv(), summary_prefix="vs_", return_pointer=FALSE)
+spp <- function(x, y, subpart, ..., envir=globalenv(), summary_prefix="vs_", return_pointer=FALSE, vu_summary_only=FALSE)
 {
+  if (vu_summary_only)
+    return_pointer = FALSE
+
   p <- y
   if (!inherits(p, "pointer"))
     p <- ptr(y)
@@ -171,7 +175,8 @@ spp <- function(x, y, subpart, ..., envir=globalenv(), summary_prefix="vs_", ret
   if (is.na(envirVarName))
     envirVarName <- deparse(formals()[["envir"]])
 
-  assign(subVarName, d, envir=envir)
+  if (!vu_summary_only)
+    assign(subVarName, d, envir=envir)
   assign(summary_prefix %_% subVarName, vsd, envir=envir)
 
   vsdp <- eval(substitute(ptr(vsdpName, envir=envir), list(vsdpName=summary_prefix %_% subVarName)))
