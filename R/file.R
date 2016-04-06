@@ -45,10 +45,12 @@ clipwd <- function(use_dirname=TRUE, dir, source_files=TRUE, verbose=TRUE, ...)
   if (source_files) {
     files <- choose.files(filters=Filters[c("R"), ])
     for (f in files) {
+      sourceCommand <- "source(\"./" %_% basename(f) %_% "\", keep.source=FALSE)"
       if (verbose)
-        cat("Running command 'source(\"./" %_% basename(f) %_% "\", keep.source=FALSE)'.... ")
+        cat("Running command '" %_% sourceCommand %_% "'.... ")
       source(f, keep.source=FALSE)
       if (verbose) { cat("Done.", fill=TRUE); flush.console() }
+      writeClipboard(sourceCommand, format=1)
     }
   }
 }
