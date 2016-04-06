@@ -2,6 +2,7 @@
 split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
 {
   variables <- tail(as.character(attr(terms(x), "variables")), -1L)
+  responseIndex <- attr(terms(x), "response")
 
   rePlusMinus <- ifelse(is.null(re_plus_minus), "\\s+(\\+|-)\\s+", re_plus_minus)
   exes <- tail(as.character(x), 1L)
