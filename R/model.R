@@ -40,7 +40,7 @@ split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
     #variables = variables,
     all_vars = all.vars(x),
     has_intercept = attr(terms(x), "intercept") == 1,
-    has_response = attr(terms(x), "response") == 1
+    has_response = attr(terms(x), "response") == 1,
     terms = terms(x)
   )
 
