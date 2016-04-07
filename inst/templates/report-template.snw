@@ -105,6 +105,10 @@
 
 %\usepackage{here}
 
+% We can't use the "here" package if we want PDF bookmarks for tables & figures, so:
+\extrafloats{500}
+\maxdeadcycles=1000
+
 % Change bibliographical reference numbering style:
 \makeatletter
   \renewcommand\@biblabel[1]{\textbf{#1.}}

@@ -63,3 +63,16 @@ true_unicode <- function(x) {
 
 #' @export
 tu <- true_unicode
+
+
+#' @export
+get_formatted_p_value <- function(p.value, le="<", fmt="%1.3f", ...)
+{
+  if (is.character(p.value))
+    return (p.value)
+
+  return (ifelse(p.value < 0.001, le %_% " 0.001", sprintf(fmt, p.value)))
+}
+
+#' @export
+gfp <- get_formatted_p_value
