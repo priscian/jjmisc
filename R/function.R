@@ -185,6 +185,11 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     if (is.null(variables))
       variables <- setdiff(ls(evalEnv, all=TRUE), c(names(formals(fun))))
 
+    ## N.B. Not used yet.
+    variableNames <- variables
+    if (!is.null(names(variables)))
+      variableNames[names(variables) != ""] <- names(variables)[names(variables) != ""]
+
     argEnv <- as.environment(argList[names(argList) != ""]) # Can only save named arguments.
     if (!is.null(file_path)) {
       if (save_) {
@@ -193,10 +198,7 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
           filePath <- paste(file_path_sans_ext(file_path), do.call("make_current_timestamp", timestampArgs), sep='_') %_% '.' %_% file_ext(file_path)
 
         if (verbose) cat("Saving data file \"" %_% filePath %_% "\".... ")
-        variableNames <- variables
-        if (!is.null(names(variables)))
-          variableNames[names(variables) != ""] <- names(variables)[names(variables) != ""]
-        save(list=variableNames, file=filePath, envir=evalEnv)
+        save(list=variables, file=filePath, envir=evalEnv)
         if (copy_args)
           append_rda(filePath, objects=ls(argEnv, all=TRUE), envir=argEnv)
         if (verbose) { cat("Done.", fill=TRUE); flush.console() }
