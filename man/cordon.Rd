@@ -20,7 +20,7 @@ cordon(fun, ..., arguments = list(), envir = environment(),
 
 \item{file_path}{For \code{action <- c("save", "load")}, the path to the file to which the \code{variables} in \code{envir} will be written, or from which objects will be extracted to \code{envir}. If \code{timestamp <- TRUE}, the file name provides a base name to which a timestamp is appended.}
 
-\item{variables}{A character string naming variables among the arguments to, or in the body of, \code{fun} that will be extracted from the evaluation environment.}
+\item{variables}{A character string naming variables among the arguments to, or in the body of, \code{fun} that will be extracted from the evaluation environment. If any of the strings are named, those names with carry the variables' values in \code{envir}.}
 
 \item{copy_args}{Logical: Should all named arguments to \code{fun} also be extracted from the evaluation environment (and for \code{action <- "save"}, saved)?}
 

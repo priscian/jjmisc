@@ -93,7 +93,7 @@ make_current_timestamp <- function(fmt="%Y-%m-%d", use_seconds=FALSE, seconds_se
 #' @param arguments A list of additional arguments for passing into \code{fun}; can be used e.g. when the formal arguments of \code{fun} conflict with those of the current function.
 #' @param envir Environment where \code{variables} will be copied after \code{fun} has been evaluated. For \code{action <- "save"}, also names what variables in the evaluation environment will be \code{save()}d to an external file.
 #' @param file_path For \code{action <- c("save", "load")}, the path to the file to which the \code{variables} in \code{envir} will be written, or from which objects will be extracted to \code{envir}. If \code{timestamp <- TRUE}, the file name provides a base name to which a timestamp is appended.
-#' @param variables A character string naming variables among the arguments to, or in the body of, \code{fun} that will be extracted from the evaluation environment.
+#' @param variables A character string naming variables among the arguments to, or in the body of, \code{fun} that will be extracted from the evaluation environment. If any of the strings are named, those names with carry the variables' values in \code{envir}.
 #' @param copy_args Logical: Should all named arguments to \code{fun} also be extracted from the evaluation environment (and for \code{action <- "save"}, saved)?
 #' @param timestamp A logical value deciding whether a current timestamp (default format \code{%Y-%m-%d+[seconds after midnight]}) should be appended to the base file name given as part of \code{file_path}.
 #' @param action A character string denoting the purpose of calling \code{cordon()} in the first place:
@@ -193,7 +193,10 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
           filePath <- paste(file_path_sans_ext(file_path), do.call("make_current_timestamp", timestampArgs), sep='_') %_% '.' %_% file_ext(file_path)
 
         if (verbose) cat("Saving data file \"" %_% filePath %_% "\".... ")
-        save(list=variables, file=filePath, envir=evalEnv)
+        variableNames <- variables
+        if (!is.null(names(variables)))
+          variableNames[names(variables) != ""] <- names(variables)[names(variables) != ""]
+        save(list=variableNames, file=filePath, envir=evalEnv)
         if (copy_args)
           append_rda(filePath, objects=ls(argEnv, all=TRUE), envir=argEnv)
         if (verbose) { cat("Done.", fill=TRUE); flush.console() }
