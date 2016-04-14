@@ -46,11 +46,14 @@ clipwd <- function(use_dirname=TRUE, dir, source_files=TRUE, verbose=TRUE, ...)
     files <- choose.files(filters=Filters[c("R"), ])
     sourceCommands <- NULL
     for (f in files) {
-      sourceCommand <- "source(\"./" %_% basename(f) %_% "\", keep.source=FALSE)"
+      #sourceCommand <- "source(\"./" %_% basename(f) %_% "\", keep.source=FALSE)"
+      sourceCommand <- "source(\"" %_% normalizePath(f, '/') %_% "\", keep.source=FALSE)"
       sourceCommands <- c(sourceCommands, sourceCommand)
       if (verbose)
         cat("Running command '" %_% sourceCommand %_% "'.... ")
-      tryCatch(source(f, keep.source=FALSE), finally=writeClipboard(paste(sourceCommands, sep='\n'), format=1))
+      ## N.B. 'writeClipboard()' automatically ends character strings with '\n'; convert to raw to prevent this.
+      tryCatch(source(f, keep.source=FALSE), # Need to add extra "raw" to raw string to prevent deletion of last character.
+        finally={ b <- charToRaw(paste(sourceCommands, collapse='\n')); b[length(b) + 1] <- as.raw(0); writeClipboard(b, format=1) })
       if (verbose) { cat("Done.", fill=TRUE); flush.console() }
     }
   }

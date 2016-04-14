@@ -1,8 +1,8 @@
 Package: jjmisc
-Title: Various Functions to Aid Report Creation
-Version: 0.8.1
+Title: Various R Functions to Aid Report Creation
+Version: 0.8.2
 Authors@R: person("Jim", "Java", email = "priscian@gmail.com", role = c("aut", "cre"))
-Description: These are various functions I've created to help me conduct analyses and create reports from them.
+Description: These are various R functions I've created to help me conduct analyses and create reports from them.
 Depends: R (>= 3.2.0), lubridate, tools, ggplot2, Hmisc, devEMF, stringr
 Imports: gdata, gtools, pryr, BiocInstaller, RCurl
 Suggests: knitr, testthat

@@ -91,16 +91,16 @@ make_current_timestamp <- function(fmt="%Y-%m-%d", use_seconds=FALSE, seconds_se
 #' @param fun The function to be evaluated.
 #' @param ... Arguments to be passed into \code{fun}.
 #' @param arguments A list of additional arguments for passing into \code{fun}; can be used e.g. when the formal arguments of \code{fun} conflict with those of the current function.
-#' @param envir Environment where \code{variables} will be copied after \code{fun} has been evaluated. For \code{action <- "save"}, also names what variables in the evaluation environment will be \code{save()}d to an external file.
-#' @param file_path For \code{action <- c("save", "load")}, the path to the file to which the \code{variables} in \code{envir} will be written, or from which objects will be extracted to \code{envir}. If \code{timestamp <- TRUE}, the file name provides a base name to which a timestamp is appended.
+#' @param envir Environment where \code{variables} will be copied after \code{fun} has been evaluated. For \code{action = "save"}, also names what variables in the evaluation environment will be \code{save()}d to an external file.
+#' @param file_path For \code{action = c("save", "load")}, the path to the file to which the \code{variables} in \code{envir} will be written, or from which objects will be extracted to \code{envir}. If \code{timestamp <- TRUE}, the file name provides a base name to which a timestamp is appended.
 #' @param variables A character string naming variables among the arguments to, or in the body of, \code{fun} that will be extracted from the evaluation environment. If any of the strings are named, those names with carry the variables' values in \code{envir}.
-#' @param copy_args Logical: Should all named arguments to \code{fun} also be extracted from the evaluation environment (and for \code{action <- "save"}, saved)?
+#' @param copy_args Logical: Should all named arguments to \code{fun} also be extracted from the evaluation environment (and for \code{action = "save"}, saved)?
 #' @param timestamp A logical value deciding whether a current timestamp (default format \code{%Y-%m-%d+[seconds after midnight]}) should be appended to the base file name given as part of \code{file_path}.
 #' @param action A character string denoting the purpose of calling \code{cordon()} in the first place:
 #' \tabular{ll}{
 #'   run \tab Evaluate \code{fun} and extract variables, but don't load or save them. \cr
 #'   save \tab Evaluate \code{fun}, extract variables, and save them to an external file. \cr
-#'   load \tab Load saved data from \code{file_path}. If \code{timestamp <- TRUE}, load the most recent version according to the timestamped file name.\cr
+#'   load \tab Load saved data from \code{file_path}. If \code{timestamp = TRUE}, load the most recent version according to the timestamped file name.\cr
 #'   skip \tab Do nothing, i.e. prevent \code{fun} from being evaluated at all. \cr
 #'   archive \tab Not implemented.
 #' }
