@@ -1,3 +1,4 @@
+#' @export
 shift <- function (x, i=1L, roll=TRUE, na_rm=FALSE)
 {
   n  <- length(x)
@@ -35,3 +36,10 @@ shift <- function (x, i=1L, roll=TRUE, na_rm=FALSE)
 # shift(1:10, -5, roll=FALSE)
 # shift(1:10, 5, roll=FALSE, na_rm=TRUE)
 # shift(1:10, -5, roll=FALSE, na_rm=TRUE)
+
+
+#'@export
+chunk <- function(x, size)
+{
+  split(x, as.numeric(gl(length(x), size, length(x))))
+}
