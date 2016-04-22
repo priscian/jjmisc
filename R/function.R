@@ -165,10 +165,10 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     hasDots <- FALSE
     if (!is.null(argList[["..."]])) hasDots <- TRUE
     argList[["..."]] <- NULL
-    dots <- get_dots(...)
+    dots <- get_dots(..., evaluate=TRUE)
     ## Add '...' arguments to argument list.
-    argList <- modifyList(argList, dots$arguments[dots$named_dots != ""]) # Replace duplicate named arguments with those from '...' and add new named arguments.
-    argList <- c(argList, dots$arguments[dots$named_dots == ""]) # Tack on unnamed arguments from '...'.
+    argList <- modifyList(argList, dots$evaluated[dots$named_dots != ""]) # Replace duplicate named arguments with those from '...' and add new named arguments.
+    argList <- c(argList, dots$evaluated[dots$named_dots == ""]) # Tack on unnamed arguments from '...'.
     ## Add 'arguments' to 'argList'.
     argList <- modifyList(argList, arguments[names(arguments) != ""]) # Replace duplicate named arguments with those from 'arguments' and add new named arguments.
     argList <- c(argList, arguments[names(arguments) == ""]) # Tack on unnamed arguments from 'arguments'.
