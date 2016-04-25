@@ -63,6 +63,9 @@ unfactor.pointer <- function(x, ...)
 #' @export
 summary_f <- function(x, as.factor=FALSE, ..., factor...=NULL)
 {
+  if (is.null(factor...))
+    factor... <- list()
+
   factorArgs <- list(
     x <- x
   )
