@@ -95,9 +95,9 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         digits = digits,
         pctdig = 1L,
         exclude1 = exclude1,
-        #npct.size = "smaller[2]",
-        #Nsize = "smaller[1]",
-        #outer.size = "smaller[2]",
+        npct.size = "smaller[2]",
+        Nsize = "smaller[1]",
+        outer.size = "smaller[2]",
         legend.bottom = TRUE
       )
       ## Add '...' arguments to argument list.
