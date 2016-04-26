@@ -21,7 +21,7 @@ renumber.data.frame <- function(x, ...)
 
 
 #' @export
-vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size="small", exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), ...)
+vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size="small", exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, ...)
 {
   if (!inherits(p, "pointer"))
     stop("Function argument is not a pointer.")
@@ -106,7 +106,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
       latexArgs <- modifyList(latexArgs, latex...)
 
       if (length(latex_corrections) > 0L) {
-        l <- capture.output(do.call(Hmisc::latex, latexArgs))
+        l <- capture.output(rv <- do.call(Hmisc::latex, latexArgs))
         for (f in latex_corrections) {
           l <- do.call(f, list(l))
         }
@@ -114,10 +114,13 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         cat(l, sep='\n')
       }
       else {
-        do.call(Hmisc::latex, latexArgs)
+        rv <- do.call(Hmisc::latex, latexArgs)
       }
 
-      return (nop())
+      if (return_latex)
+        return (rv)
+      else
+        return (nop())
     }
   }
 }
