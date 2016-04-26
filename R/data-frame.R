@@ -21,7 +21,7 @@ renumber.data.frame <- function(x, ...)
 
 
 #' @export
-vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size="small", exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), latex...=list(), print...=list(), ...)
+vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size="small", exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), ...)
 {
   if (!inherits(p, "pointer"))
     stop("Function argument is not a pointer.")
@@ -31,6 +31,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
   dots <- get_dots(..., evaluate=TRUE)
 
+  environment(f) <- environment()
   split_f <- split(f)
 
   ## What is this for? 'v_' doesn't seem to be used for anything.
@@ -53,7 +54,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
     formula = f,
     data = ..(p),
     subset = subset,
-    method = "reverse",
+    #method = "reverse", # Only for 'summary.formula()'.
     test = test,
     overall = overall,
     na.include = na_include,
@@ -61,7 +62,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
   )
   summaryFormulaArgs = modifyList(summaryFormulaArgs, summary...)
 
-  s_ <- try(do.call("summary", summaryFormulaArgs), silent=!verbose)
+  s_ <- try(do.call(summary_formula, summaryFormulaArgs), silent=!verbose)
 
   if (inherits(s_, "try-error"))
     return (NULL)
@@ -96,7 +97,8 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         exclude1 = exclude1,
         npct.size = "smaller[2]",
         Nsize = "smaller[1]",
-        outer.size = "smaller[2]"
+        outer.size = "smaller[2]",
+        legend.bottom = TRUE
       )
       ## Add '...' arguments to argument list.
       #latexArgs <- c(modifyList(latexArgs, dots$arguments[dots$named_dots != ""]), dots$arguments[dots$named_dots == ""])
