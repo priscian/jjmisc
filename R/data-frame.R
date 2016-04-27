@@ -21,7 +21,7 @@ renumber.data.frame <- function(x, ...)
 
 
 #' @export
-vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, ...)
+vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summary", latex...=list(), print...=list(), return_latex=FALSE, ...)
 {
   if (!inherits(p, "pointer"))
     stop("Function argument is not a pointer.")
