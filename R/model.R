@@ -50,3 +50,21 @@ split.formula <- function(x, re_plus_minus=NULL, remove_extra_parens=TRUE, ...)
 
 ## usage:
 # split(x <- a ~ b + 1 + c + .d + offset(e) + b %in% a)
+
+
+#' @export
+flip  <- function(x, ...)
+  UseMethod("flip")
+
+
+#' @export
+flip.formula <- function(x)
+{
+  if (!inherits(x, "formula"))
+    stop("Function argument must be a formula.")
+
+  s <- split(x)
+  x <- s$right_side %_% " ~ " %_% ifelse(is_invalid(s$left_side), "1", s$left_side)
+
+  x
+}

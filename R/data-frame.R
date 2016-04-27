@@ -62,6 +62,10 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
   )
   summaryFormulaArgs = modifyList(summaryFormulaArgs, summary...)
 
+  if (!(identical(summary_formula, Hmisc::summaryM) || identical(summary_formula, "summaryM"))){
+    summaryFormulaArgs$formula <- flip(summaryFormulaArgs$formula)
+    summaryFormulaArgs$method <- "reverse"
+  }
   s_ <- try(do.call(summary_formula, summaryFormulaArgs), silent=!verbose)
 
   if (inherits(s_, "try-error"))
