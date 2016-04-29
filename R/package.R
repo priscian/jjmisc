@@ -7,9 +7,10 @@ has_internet = function(hostname="www.google.com")
 
 #' @export
 #' @importFrom BiocInstaller biocLite
-bioc_lite <- function(..., local=FALSE)
+bioc_lite <- function(..., local_lib=FALSE)
 {
-  rm(biocLite, envir=.GlobalEnv)
+  if (exists("biocLite", envir=.GlobalEnv))
+    rm("biocLite", envir=.GlobalEnv)
 
   if (has_internet()) {
     cat("Downloading 'biocLite()' from source....\n")
@@ -19,7 +20,7 @@ bioc_lite <- function(..., local=FALSE)
     library(BiocInstaller)
   }
 
-  if (!local)
+  if (!local_lib)
     biocLite(...)
   else {
     #libPath <- Sys.getenv("R_LIBS_USER")
@@ -27,6 +28,8 @@ bioc_lite <- function(..., local=FALSE)
     biocLite(..., lib=libPath, lib.loc=libPath, instlib=libPath, INSTALL_opts=c("--no-clean-on-error"))
   }
 }
+## N.B. For "Bioconductor does not yet support R version x.y.z", update base packages like this:
+# update.packages(instlib=strsplit(Sys.getenv("R_LIBS_USER"), ";", perl=TRUE)[[1]][1])
 
 
 #' @export
