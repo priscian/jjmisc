@@ -11,7 +11,7 @@ bioc_lite <- function(..., local=FALSE)
 {
   rm(biocLite, envir=.GlobalEnv)
 
-  if (.has_internet()) {
+  if (has_internet()) {
     cat("Downloading 'biocLite()' from source....\n")
     source("https://www.bioconductor.org/biocLite.R")
   } else {
