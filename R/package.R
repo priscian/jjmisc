@@ -22,7 +22,8 @@ bioc_lite <- function(..., local=FALSE)
   if (!local)
     biocLite(...)
   else {
-    libPath <- Sys.getenv("R_LIBS_USER")
+    #libPath <- Sys.getenv("R_LIBS_USER")
+    libPath <- strsplit(Sys.getenv("R_LIBS_USER"), ";", perl=TRUE)[[1]][1]
     biocLite(..., lib=libPath, lib.loc=libPath, instlib=libPath, INSTALL_opts=c("--no-clean-on-error"))
   }
 }
