@@ -180,8 +180,8 @@ spp <- function(x, y, subpart, ..., envir=globalenv(), summary_prefix="vs_", ret
   vsd <- vu_summary
 
   varNames <- sapply(match.call(expand.dots=TRUE)[-1L], deparse)
-  subVarName <- varNames["x"]
-  envirVarName <- varNames["envir"]
+  subVarName <- varNames[["x"]]
+  envirVarName <- varNames[["envir"]]
   if (is.na(envirVarName))
     envirVarName <- deparse(formals()[["envir"]])
 
