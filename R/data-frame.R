@@ -404,9 +404,7 @@ insert_row.data.frame <- function(x, newrow, rnum) {
 #' @export
 cards <- function(x, header=TRUE, as.is=TRUE, check.names=FALSE, stringsAsFactors=FALSE, ...)
 {
-  zz <- textConnection(x)
-  tab <- read.table(zz, header=header, as.is=as.is, check.names=check.names, stringsAsFactors=stringsAsFactors, ...)
-  close(zz)
+  tab <- read.table(text=x, header=header, as.is=as.is, check.names=check.names, stringsAsFactors=stringsAsFactors, ...)
 
   return (tab)
 }
