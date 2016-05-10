@@ -49,11 +49,13 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
   ## Use subset if dependent variable has missing observations.
   dependent <- split_f$left_side
-  if (!is_invalid(dependent)) {
+  if (!is_invalid(dependent) & !all(dependent == "1")) {
     dependent <- all.vars(as.formula("~" %_% split_f$left_side))[1L]
     if (any(!complete.cases(..(p)[[dependent]])))
       subset <- complete.cases(..(p)[[dependent]]) & subset
   }
+  else
+    f <- update(f, NULL ~ .)
 
   summaryFormulaArgs = list(
     formula = f,
