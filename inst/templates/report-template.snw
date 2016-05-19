@@ -20,6 +20,7 @@
 \usepackage{ifthen}
 \usepackage[ansinew]{inputenc}
 \usepackage{lipsum}
+\usepackage{lmodern}
 \usepackage{longtable}
 \usepackage{lscape}
 \usepackage{morefloats}
