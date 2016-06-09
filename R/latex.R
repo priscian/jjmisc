@@ -173,3 +173,35 @@ latex_correct_caption_position <- function(l)
 
   l
 }
+
+
+### R Markdown
+
+#' @export
+rmd_print <- function(x, ...)
+  UseMethod("rmd_print")
+
+
+#' @export
+rmd_print.summaryM <- function(x, ...)
+{
+  fun <- Hmisc::print.summaryM
+  ## This removes leading spaces from the numerical columns of the summary.
+  body(fun) <- parse(text=paste(sub("cstats <- paste\\(spaces", "# cstats <- paste\\(spaces", format(body(print.summaryM))), collapse="\n"))
+
+  fun(x, ...)
+}
+
+
+#' @export
+rmd_print.default <- function(x, ..., kind=c("print", "kable", "pander"))
+{
+  kind <- match.arg(kind)
+  rmdFun <- switch(kind,
+    print = print,
+    kable = knitr::kable,
+    pander = pander::pander
+  )
+
+  rmdFun(x, ...)
+}

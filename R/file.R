@@ -58,3 +58,10 @@ clipwd <- function(use_dirname=TRUE, dir, source_files=TRUE, verbose=TRUE, ...)
     }
   }
 }
+
+
+#' @export
+clip_wd <- function(..., source_files=FALSE)
+{
+  clipwd(..., source_files=source_files)
+}
