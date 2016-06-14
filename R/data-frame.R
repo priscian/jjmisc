@@ -299,7 +299,7 @@ select_df <- function(x, ..., subpart=NULL, show_always=NULL, view=FALSE, sort=c
 
   cols <- seq_along(names(x))
 
-  if (!is.null(dots$arguments)) {
+  if (!is_invalid(dots$arguments)) {
     ## Which symbols can be evaluated as value types or in the calling context?
     evalFun <- function(a, b)
     {

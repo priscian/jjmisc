@@ -271,7 +271,7 @@ merge_levels <- function(x, new_levels, ..., other_level="other", drop_levels=FA
     label(newFactor) <- label
 
   dots <- get_dots(...)
-  if (!is.null(dots$arguments)) # I.e. if there are non-formal parameters in function call.
+  if (!is_invalid(dots$arguments)) # I.e. if there are non-formal parameters in function call.
     sort <- TRUE
   if (sort)
     newFactor <- order_levels(newFactor, ...)
@@ -328,20 +328,20 @@ rename_levels <- function(x, ..., in_order=FALSE, merge...=NULL, order...=NULL, 
   ol <- levels(x)
 
   dots <- get_dots(...)
-  if (is.null(dots$arguments)) # I.e. if there are non-formal parameters in function call.
+  if (is_invalid(dots$arguments)) # I.e. if there are non-formal parameters in function call.
     return (x)
 
   nl <- ol
   names(nl) <- ol
 
   named <- dots$as_character[dots$named_dots != ""]
-  if (!is.null(named)) {
+  if (!is_invalid(named)) {
     named <- named[names(named) %in% ol]
     null <- sapply(names(named), function (s) names(nl)[names(nl) %in% s] <<- named[s]); null <- NULL
   }
 
   unnamed <- dots$as_character[dots$named_dots == ""]
-  if (!is.null(unnamed)) {
+  if (!is_invalid(unnamed)) {
     if (length(unnamed) > length(nl) - length(named))
       unnamed <- rep(unnamed, length.out=length(nl) - length(named))
     repl <- names(nl)[names(nl) %in% ol]
