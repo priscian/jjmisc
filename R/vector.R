@@ -4,6 +4,13 @@ shift <- function (x, i=1L, roll=TRUE, na_rm=FALSE)
   n  <- length(x)
   if (n == 0L) return(x)
 
+  if (!roll && abs(i) >= n) {
+    rv <- rep(NA, n)
+    if (na_rm) rv <- vector(mode(x))
+
+    return (rv)
+  }
+
   j <- i %% n
 
   if (j == 0L) return(x)
