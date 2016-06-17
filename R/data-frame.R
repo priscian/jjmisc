@@ -127,10 +127,10 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
 
       if (return_latex)
         return (rv)
-      else
-        return (s_)
     }
   }
+
+  return (s_)
 }
 
 
