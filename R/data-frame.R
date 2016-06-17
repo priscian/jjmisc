@@ -21,7 +21,7 @@ renumber.data.frame <- function(x, ...)
 
 
 #' @export
-vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, ...)
+vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, printout=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, ...)
 {
   if (!inherits(p, "pointer"))
     stop("Function argument is not a pointer.")
@@ -87,7 +87,8 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
       printSummaryFormulaArgs <- c(modifyList(printSummaryFormulaArgs, dots$evaluated[dots$named_dots != ""]), dots$evaluated[dots$named_dots == ""])
       printSummaryFormulaArgs = modifyList(printSummaryFormulaArgs, print...)
 
-      do.call("print", printSummaryFormulaArgs)
+      if (printout)
+        do.call("print", printSummaryFormulaArgs)
     }
     else {
       latexArgs = list(
@@ -119,7 +120,8 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
           l <- do.call(f, list(l))
         }
 
-        cat(l, sep='\n')
+        if (printout)
+          cat(l, sep='\n')
       }
       else {
         rv <- do.call(Hmisc::latex, latexArgs)
