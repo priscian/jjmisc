@@ -79,6 +79,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         x = s_,
         long = TRUE,
         digits = digits,
+        what = "%",
         exclude1 = exclude1,
         prtest = c("P")
       )
@@ -102,12 +103,14 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         center = "center",
         long = TRUE,
         digits = digits,
+        what = "%",
         pctdig = 1L,
         exclude1 = exclude1,
         npct.size = "smaller[2]",
         Nsize = "smaller[1]",
         outer.size = "smaller[2]",
-        legend.bottom = TRUE
+        legend.bottom = TRUE,
+        prtest = c("P")
       )
       ## Add '...' arguments to argument list.
       #latexArgs <- c(modifyList(latexArgs, dots$arguments[dots$named_dots != ""]), dots$arguments[dots$named_dots == ""])
