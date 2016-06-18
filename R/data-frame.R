@@ -39,24 +39,6 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
   environment(f) <- environment()
   split_f <- split(f)
 
-  ## What is this for? 'v_' doesn't seem to be used for anything.
-  independent <- all.vars(as.formula("~" %_% split_f$right_side))
-  for (i in independent) {
-    if (exists(i, envir=envir)) {
-      v_ <- get(i, envir=envir)
-    }
-  }
-
-  ## Use subset if dependent variable has missing observations.
-  dependent <- split_f$left_side
-  if (!is_invalid(dependent) & !all(dependent == "1")) {
-    dependent <- all.vars(as.formula("~" %_% split_f$left_side))[1L]
-    if (any(!complete.cases(..(p)[[dependent]])))
-      subset <- complete.cases(..(p)[[dependent]]) & subset
-  }
-  else
-    f <- update(f, NULL ~ .)
-
   summaryFormulaArgs = list(
     formula = f,
     data = ..(p),
