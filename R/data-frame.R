@@ -431,3 +431,10 @@ cards <- function(x, header=TRUE, as.is=TRUE, check.names=FALSE, stringsAsFactor
 # 2 3 2 144
 # 2 3 2 155
 # ')
+
+
+#' @export
+dataframe <- function (..., row.names=NULL, check.rows=FALSE, check.names=FALSE, fix.empty.names=FALSE, stringsAsFactors=FALSE)
+{
+  data.frame(..., row.names=row.names, check.rows=check.rows, check.names=check.names, fix.empty.names=fix.empty.names, stringsAsFactors=stringsAsFactors)
+}
