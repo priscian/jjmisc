@@ -21,7 +21,7 @@ renumber.data.frame <- function(x, ...)
 
 
 #' @export
-vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, printout=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, ...)
+vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, verbose=TRUE, printout=TRUE, latex=FALSE, size=NULL, exclude1=FALSE, envir=parent.frame(), na_include=FALSE, continuous=5L, latex_corrections=list(jjmisc:::latex_correct_insert_bottom, jjmisc:::latex_correct_caption_position), summary...=list(), summary_formula="summaryM", latex...=list(), print...=list(), return_latex=FALSE, evaluate_dots=TRUE, ...)
 {
   if (!inherits(p, "pointer"))
     stop("Function argument is not a pointer.")
@@ -29,7 +29,7 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
   if (is.null(subset))
     subset <- TRUE
 
-  dots <- get_dots(..., evaluate=TRUE)
+  dots <- get_dots(..., evaluate=evaluate_dots)
 
   if (!(identical(summary_formula, Hmisc::summaryM) || identical(summary_formula, "summaryM"))) {
     f <- flip(f)
@@ -66,8 +66,9 @@ vu_summary <- function(f, p, subset=TRUE, test=FALSE, digits=5L, overall=FALSE, 
         prtest = c("P")
       )
       ## Add '...' arguments to argument list.
-      #printSummaryFormulaArgs <- c(modifyList(printSummaryFormulaArgs, dots$arguments[dots$named_dots != ""]), dots$arguments[dots$named_dots == ""])
-      printSummaryFormulaArgs <- c(modifyList(printSummaryFormulaArgs, dots$evaluated[dots$named_dots != ""]), dots$evaluated[dots$named_dots == ""])
+      dotsArguments <- dots$arguments
+      if (evaluate_dots) dotsArguments <- dots$evaluated
+      printSummaryFormulaArgs <- c(modifyList(printSummaryFormulaArgs, dotsArguments[dots$named_dots != ""]), dotsArguments[dots$named_dots == ""])
       printSummaryFormulaArgs = modifyList(printSummaryFormulaArgs, print...)
 
       if (printout)

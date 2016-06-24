@@ -183,13 +183,39 @@ rmd_print <- function(x, ...)
 
 
 #' @export
-rmd_print.summaryM <- function(x, ...)
+stub_fun <- function(...) invisible()
+
+
+#' @export
+rmd_print.summaryM <- function(x, header_text="\\\\n\\\\nDescriptive Statistics", use_default_printout=TRUE, ...)
 {
   fun <- Hmisc::print.summaryM
-  ## This removes leading spaces from the numerical columns of the summary.
-  body(fun) <- parse(text=paste(sub("cstats <- paste\\(spaces", "# cstats <- paste\\(spaces", format(body(print.summaryM))), collapse="\n"))
 
-  fun(x, ...)
+  ## Alter the body of 'fun' for our purposes.
+  bodyText <- format(body(fun))
+
+  ## Remove leading spaces from the numerical columns of the summary.
+  bodyText <- sub("(cstats <- paste\\(spaces)", "# \\1", bodyText, perl=TRUE)
+
+  if (!missing(header_text))
+    bodyText <- sub(formals()$header_text, header_text, bodyText, perl=TRUE)
+
+  ## Add total population 'N' as attribute.
+  bodyText <- append(bodyText, "attr(cstats, 'N') <- x$N", after=grep("dimnames\\(cstats\\) <-", bodyText, perl=TRUE)[1])
+
+  body(fun) <- parse(text=paste(bodyText, collapse="\n"))
+
+  if (use_default_printout)
+    r <- fun(x, ...)
+  else {
+    dev_null <- capture.output(r <- fun(x, ...))
+    ## This is a stub for further development; see 'print.summaryM()' for details.
+    print.char.matrix(r, col.names=FALSE, col.txt.align="left")
+    ## I could try altering the 'capture.output()' of this into R Markdown "multiline" tables;
+    ## v. http://rapporter.github.io/pander/#markdown-tables
+  }
+
+  invisible(r)
 }
 
 
