@@ -302,3 +302,22 @@ eval_js = function(..., envir=parent.frame(), enclos=if(is.list(envir) || is.pai
   expr <- parse(text=expr)
   eval(expr, envir, enclos)
 }
+
+
+## Return all combinations of successive vectors in their given order.
+#' @export
+combine_groups <- function(x, combine_fun=base::paste, ...)
+{
+  comb_factory <- function(...)
+  {
+    ## Make sure that '...' comes from 'comb_factory()' by NOT giving it as a formal argument of the following function:
+    function(x, y) { as.vector(t(outer(x, y, FUN=combine_fun, ...))) }
+  }
+  comb <- comb_factory(...)
+
+  Reduce(comb, x)
+}
+
+## usage:
+# colParts <- list(c("Global", "NH", "SH", "Tropics", "NH Extratropic", "SH Extratropic", "NH Polar", "SH Polar"), c("", " Land", " Ocean"))
+# combine_groups(colParts, sep="")

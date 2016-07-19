@@ -211,8 +211,7 @@ rmd_print.summaryM <- function(x, header_text="\\\\n\\\\nDescriptive Statistics"
     dev_null <- capture.output(r <- fun(x, ...))
     ## This is a stub for further development; see 'print.summaryM()' for details.
     print.char.matrix(r, col.names=FALSE, col.txt.align="left")
-    ## I could try altering the 'capture.output()' of this into R Markdown "multiline" tables;
-    ## v. http://rapporter.github.io/pander/#markdown-tables
+    ## I could try altering the 'capture.output()' of this into R Markdown "multiline" tables; v. http://rapporter.github.io/pander/#markdown-tables.
   }
 
   invisible(r)

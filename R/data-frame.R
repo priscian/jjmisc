@@ -439,3 +439,11 @@ dataframe <- function (..., row.names=NULL, check.rows=FALSE, check.names=FALSE,
 {
   data.frame(..., row.names=row.names, check.rows=check.rows, check.names=check.names, fix.empty.names=fix.empty.names, stringsAsFactors=stringsAsFactors)
 }
+
+
+## Create a merge function to use with 'Reduce()' that assumes priority of data frame 'y' by leaving duplicate column names in 'x' out of the merge.
+#' @export
+merge_fun_factory <- function(...)
+{
+  function(x, y) base::merge(x, y[, c(eval(get_dots(...)$arguments$by), setdiff(colnames(y), colnames(x)))], ...)
+}

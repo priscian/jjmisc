@@ -100,3 +100,59 @@ latex_plot.default <- function(x, ..., lp_fun=plot, devices=list(pdf=list(height
 
   return (nop())
 }
+
+
+## Get cardinal-point coordinates from plot device.
+#' @export
+get_cardinal_point <- function(cardinal_position="center", margin_x_percent=0, margin_y_percent=margin_x_percent, as_list=TRUE)
+{
+  cp <- cardinal_position
+
+  marginXWidth <- (par("usr")[2] - par("usr")[1]) * (margin_x_percent / 100)
+  marginYHeight <- (par("usr")[4] - par("usr")[3]) * (margin_y_percent / 100)
+  top <- par("usr")[4] - marginYHeight
+  right <- par("usr")[2] - marginXWidth
+  bottom <-  par("usr")[3] + marginYHeight
+  left <- par("usr")[1] + marginXWidth
+  centerX <- left + (right - left) / 2
+  centerY <- bottom + (top - bottom) / 2
+
+  coordinates <- switch(cp,
+    n =,
+    north = c(x=centerX, y=top),
+    ne =,
+    northeast = c(x=right, y=top),
+    e =,
+    east = c(x=right, y=centerY),
+    se =,
+    southeast = c(x=right, y=bottom),
+    s =,
+    south = c(x=centerX, y=bottom),
+    sw =,
+    southwest = c(x=left, y=bottom),
+    w =,
+    west = c(x=left, y=centerY),
+    nw =,
+    northwest = c(x=left, y=top),
+    c =,
+    center = c(x=centerX, y=centerY),
+    c(x=centerX, y=centerY) # default option
+  )
+
+  if (as_list)
+    coordinates <- as.list(coordinates)
+
+  return (coordinates)
+}
+
+
+#' @export
+get_cp_coords <- function(...)
+{
+  coordinates <- get_cardinal_point(...)
+
+  return (xy.coords(coordinates$x, coordinates$y))
+}
+
+#' @export
+cp_coords <- get_cp_coords

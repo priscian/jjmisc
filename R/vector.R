@@ -105,3 +105,25 @@ split_at <- function(x, pos, split_after=FALSE)
 {
   unname(split(x, cumsum(seq_along(x) %in% (pos + as.integer(split_after)))))
 }
+
+
+## 'cumsum()' with 'na.rm=TRUE' equivalent.
+#' @export
+cum_sum <- function(x, ...) `[<-`(x, !is.na(x), cumsum(na.omit(x), ...))
+
+
+## For non-decreasing dates, possibly with NAs, get 'diff()' whose sum equals last(x) - first(x).
+#' @export
+#' @importFrom zoo na.locf
+diffs <- function(x, to_na=NULL, ...)
+{
+  r <- diff(zoo::na.locf(x, na.rm=FALSE), ...)
+  if (!is.null(to_na))
+    is.na(r) <- r %in% to_na
+
+  r
+}
+
+## usage:
+# x <- structure(c(NA, 16456, 16473, NA, NA, 16517, 16531, 16535, 16540, 16546, 16559, 16573, 16587, 16598, 16615, 16629, 16643, 16657, 16671, 16716, 16729, 16743, NA, 16772, 16783, 16805, 16820, 16834), class = "Date")
+# diffs(x)
