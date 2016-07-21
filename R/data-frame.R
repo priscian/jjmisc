@@ -445,5 +445,6 @@ dataframe <- function (..., row.names=NULL, check.rows=FALSE, check.names=FALSE,
 #' @export
 merge_fun_factory <- function(...)
 {
-  function(x, y) base::merge(x, y[, c(eval(get_dots(...)$arguments$by), setdiff(colnames(y), colnames(x)))], ...)
+  #function(x, y) base::merge(x, y[, c(eval(get_dots(...)$arguments$by), setdiff(colnames(y), colnames(x)))], ...)
+  function(x, y) base::merge(x, y[, c(eval(get_dots(..., evaluate=TRUE)$evaluated$by), setdiff(colnames(y), colnames(x)))], ...)
 }
