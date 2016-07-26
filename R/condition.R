@@ -2,9 +2,8 @@
 #' @export
 "%eq%" <- function (x, table)
 {
-  #out <- match(x, table, nomatch = 0) > 0
   out <- x %in% table
-  out[is.na(x)] <- NA
+  is.na(out) <- is.na(x)
 
   return (out)
 }

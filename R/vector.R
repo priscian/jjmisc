@@ -69,6 +69,25 @@ seqle <- function(x, incr=1)
 ## Find leading and trailing NAs in a vector; returns 'FALSE' for leading/trailing NAs, 'TRUE' for NA-enwrapped values.
 #' @export
 na_unwrap <- function(x, ...)
+  UseMethod("na_unwrap")
+
+
+#' @export
+na_unwrap.matrix <- function(x, ...)
+{
+  apply(apply(x, 2, na_unwrap.default), 1, any)
+}
+
+
+#' @export
+na_unwrap.data.frame <- function(x, ...)
+{
+  na_unwrap.matrix(x, ...)
+}
+
+
+#' @export
+na_unwrap.default <- function(x, ...)
 {
   nai <- na.omit(x)
   #s <- rle(attr(nai, "na.action")) # See external function definition.
