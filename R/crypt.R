@@ -23,6 +23,7 @@ write_aes <- function(d, file_path, key)
 
 ## Read encypted data frame from file.
 #' @export
+#' @importFrom digest AES
 read_aes <- function(file_path, key)
 {
   dat <- readBin(file_path,"raw", n=1000L)
