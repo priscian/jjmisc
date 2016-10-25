@@ -434,6 +434,14 @@ cards <- function(x, header=TRUE, as.is=TRUE, check.names=FALSE, stringsAsFactor
 # ')
 
 
+## 'cards()' for matrix values.
+#' @export
+mcards <- function(x, header=FALSE, ...)
+{
+  data.matrix(cards(x, header=header, ...))
+}
+
+
 #' @export
 dataframe <- function (..., row.names=NULL, check.rows=FALSE, check.names=FALSE, fix.empty.names=FALSE, stringsAsFactors=FALSE)
 {
