@@ -253,7 +253,7 @@ plot_survival_by_strata <- function(km_fit, cox_fit=NULL, cox_term=1L, surv_fun=
   PlotExtras <- function() { title(plotArgs$main); PlotXLabAndLegend(); if (!is.null(cox_fit)) PlotHRs(); if (!is.null(pvalue)) PlotPValue(); }
 
   if (!latex) {
-    if (!is.null(setpar)) evalJs(setpar, envir=parent.frame())
+    if (!is.null(setpar)) eval_js(setpar, envir=parent.frame())
     do.call(surv_fun, plotArgs)
     do.call("PlotExtras", list())
   }

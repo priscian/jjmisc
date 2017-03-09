@@ -163,9 +163,9 @@ order_levels <- function(x, ..., index=FALSE, frequency=TRUE, decreasing=TRUE, o
   # '...' takes the names of factor levels to be first in order, in the order given.
   # If 'index' is true, factor levels named in '...' are considered indices for 'levels(x)'.
   # If 'frequency' is true, factor levels not named in '...' are sorted by frequency. See 'decreasing' below.
-  # If frequency <- TRUE and 'decreasing' is true, factor levels are sorted by decreasing frequency, increasing if false.
+  # If frequency = TRUE and 'decreasing' is true, factor levels are sorted by decreasing frequency, increasing if false.
   # 'other' is a catch-all level for small-frequency categories, often in factors created by function 'merge_levels()'.
-  # If other_last <- FALSE, 'other' is ignored; if it's true, the category named by 'other' is made the last level.
+  # If other_last = FALSE, 'other' is ignored; if it's true, the category named by 'other' is made the last level.
   # 'exclude' is passed to function 'factor()'. See '?factor' for details.
   # If 'add_na' is true, the function 'addNA()' is called on 'x' to turn NA into an extra level at the end.
   # 'ifany': only add an NA level if it is used, i.e. if any(is.na(x)).
@@ -230,7 +230,7 @@ merge_levels <- function(x, new_levels, ..., other_level="other", drop_levels=FA
   # 'x' is a factor variable or a variable that can be coerced into a factor.
   # 'new_levels' is a named vector or list of new factor levels created by grouping the existing levels of 'x'. If a list item is numeric, it will be used as a vector index on 'levels(x)' to extract the corresponding level names.
   # '...' is further arguments to be passed to function 'order_levels()'.
-  # 'other_level' is the name of a new level that will hold any levels of 'x' not taken up in 'new_levels'. If other_level <- FALSE, remaining levels are left intact.
+  # 'other_level' is the name of a new level that will hold any levels of 'x' not taken up in 'new_levels'. If other_level = FALSE, remaining levels are left intact.
   # If 'drop_levels' is true, remove unused factor levels from returned factor.
   # 'label' is a character string used to add or change the 'label' attribute of the returned factor.
   # If 'sort' is true, call 'order_levels()' on the returned factor using arguments '...'.

@@ -120,8 +120,32 @@ na_unwrap.default <- function(x, ...)
 
 ## http://stackoverflow.com/questions/16357962/r-split-numeric-vector-at-position
 #' @export
-split_at <- function(x, pos, split_after=FALSE)
+split_at <- function(x, pos, split_after=FALSE, ...)
+  UseMethod("split_at")
+
+
+#' @export
+split_at.data.frame <- function(x, pos, split_after=FALSE, simplify=FALSE, ...)
 {
+  sapply(split_at.default(seq(nrow(x)), pos=pos, split_after=split_after, ...),
+    function(a)
+    {
+      x[a, ]
+    }, simplify = simplify)
+}
+
+
+#' @export
+split_at.default <- function(x, pos, split_after=FALSE, ...)
+{
+  if (is.logical(pos)) {
+    if (length(pos) != length(x)) {
+      warning("'pos' is not the same length as 'x', so it's being trimmed or repeated to match.")
+      pos <- rep(pos, length.out=length(x))
+    }
+    pos <- which(pos)
+  }
+
   unname(split(x, cumsum(seq_along(x) %in% (pos + as.integer(split_after)))))
 }
 
