@@ -258,7 +258,7 @@ plot_survival_by_strata <- function(km_fit, cox_fit=NULL, cox_term=1L, surv_fun=
     do.call("PlotExtras", list())
   }
   else
-    do.call("latexPlot", merge(list(lpFun=surv_fun, caption=caption, extra=PlotExtras, translateLatex=caption_translate, setpar=setpar), plotArgs))
+    do.call("latex_plot", merge(list(lpFun=surv_fun, caption=caption, extra=PlotExtras, translateLatex=caption_translate, setpar=setpar), plotArgs))
 }
 
 
