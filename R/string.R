@@ -76,3 +76,19 @@ get_formatted_p_value <- function(p.value, le="<", fmt="%1.3f", ...)
 
 #' @export
 gfp <- get_formatted_p_value
+
+
+## V. '?base::grep' from the R command line.
+#' @export
+parse_one <- function(res, result)
+{
+  m <- do.call(rbind, lapply(seq_along(res),
+    function(i) {
+      if (result[i] == -1) return("")
+      st <- attr(result, "capture.start")[i, ]
+      substring(res[i], st, st + attr(result, "capture.length")[i, ] - 1)
+    }))
+  colnames(m) <- attr(result, "capture.names")
+
+  m
+}

@@ -19,4 +19,3 @@ nop()
 \seealso{
 \code{\link[base]{invisible}}
 }
-
