@@ -6,6 +6,8 @@ shift <- function(x, ...)
 #' @export
 shift.default <- function (x, i=1L, roll=TRUE, na_rm=FALSE)
 {
+  if (i == 0L) return (x)
+
   naRm <- function(x, na_rm)
   {
     if (!na_rm) return (x)
