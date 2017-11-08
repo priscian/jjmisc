@@ -53,7 +53,14 @@ clipwd <- function(use_dirname=TRUE, dir, source_files=TRUE, verbose=TRUE, ...)
         cat("Running command '" %_% sourceCommand %_% "'.... ")
       ## N.B. 'writeClipboard()' automatically ends character strings with '\n'; convert to raw to prevent this.
       tryCatch(source(f, keep.source=FALSE), # Need to add extra "raw" to raw string to prevent deletion of last character.
-        finally={ b <- charToRaw(paste(sourceCommands, collapse='\n')); b[length(b) + 1] <- as.raw(0); writeClipboard(b, format=1) })
+        finally = {
+          b <- charToRaw(paste(sourceCommands, collapse='\n'))
+          b[length(b) + 1] <- as.raw(0)
+          writeClipboard(b, format=1)
+          ## Write command directly to history:
+          timestamp(stamp=paste(sourceCommands, collapse='\n'), prefix="", suffix="", quiet=verbose)
+        }
+      )
       if (verbose) { cat("Done.", fill=TRUE); flush.console() }
     }
   }
