@@ -1,6 +1,6 @@
 Package: jjmisc
 Title: Various R Functions to Aid Report Creation
-Version: 0.31.0
+Version: 0.32.0
 Authors@R: person("Jim", "Java", email = "priscian@gmail.com", role = c("aut", "cre"))
 Description: These are various R functions I've created to help me conduct analyses and create reports from them.
 Depends: R (>= 3.2.0), dtplyr, lubridate, tools, ggplot2, Hmisc, devEMF, stringr

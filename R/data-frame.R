@@ -459,3 +459,23 @@ merge_fun_factory <- function(FUN=base::merge, SETDIFF=TRUE, ...)
   else
     function(x, y) FUN(x, y, ...)
 }
+
+
+#' @export
+update.mChoice <- function(x, subpart, ...)
+{
+  if (missing(subpart))
+    stop("Must supply function argument 'subpart'.")
+
+  if (!is.null(attr(x, "events"))) {
+    events = attr(x, "events")
+    for (i in seq_along(events)) {
+      temp <- events[[i]][subpart]; class(temp) = class(events[[i]])
+      events[[i]] <- temp
+    }
+
+    attr(x, "events") <- events
+  }
+
+  return (x)
+}
