@@ -204,7 +204,7 @@ order_levels <- function(x, ..., index=FALSE, frequency=TRUE, decreasing=TRUE, o
   if (add_na || hasNaLevel)
     x <- addNA(x, ifany=ifany)
 
-  attributes(x) <- merge(att, attributes(x)) # Restore object attributes.
+  attributes(x) <- modifyList(att, attributes(x)) # Restore object attributes.
 
   return (x)
 }

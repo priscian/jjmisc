@@ -49,7 +49,9 @@ get_dots <- function(..., evaluate=FALSE)
     formalArguments <- names(formals(caller))
   }
   #unevaluated <- substitute(...()) # List of '...' name-value pairs.
-  unevaluated <- eval(substitute(alist(...)))
+  unevaluated <- eval(substitute(alist(...))) # Also: match.call(expand.dots=FALSE)$`...`; however,...
+  ## ... the act of passing the dots into 'get_dots()' turns some unevaluated variables into ..1, ..2, etc. (non-atomic types?).
+  ## https://stackoverflow.com/questions/13353847/how-to-expand-an-ellipsis-argument-without-evaluating-it-in-r
   dotsAsCharacter <- unlist(sapply(unevaluated, deparse, simplify=TRUE))
   dotsNames <- names(dotsAsCharacter)
   if (is.null(dotsNames))
@@ -64,44 +66,6 @@ get_dots <- function(..., evaluate=FALSE)
   rv$arguments <- as.list(unevaluated)
   if (evaluate)
     rv$evaluated <- list(...)
-  rv$as_character <- dotsAsCharacter
-  rv$named_dots <- dotsNames
-  whichDots <- which(formalArguments == "...")
-  if (length(whichDots) == 0L)
-    whichDots <- ifelse(length(formalArguments) == 0L, 1L, length(formalArguments))
-  temp <- append(formalArguments, dotsNames[dotsNames != ""], after=whichDots)
-  rv$all_named_args <- temp[temp != "..."]
-
-  return (rv)
-}
-
-
-#' @export
-get_dots_test <- function(..., which=-1L, evaluate=FALSE)
-{
-  caller <- sys.function(which)
-  formalArguments <- NULL
-  if (!is.null(caller)) {
-    callerName <- as.list(sys.call(which))[[1L]]
-    formalArguments <- names(formals(caller))
-  }
-
-  ## This fails in 'cordon()' calls. Why?
-  actualArguments <- as.list(match.call(caller, sys.call(which), expand.dots=FALSE))[-1L]
-  unevaluated <- actualArguments$...
-  dotsAsCharacter <- unlist(sapply(unevaluated, deparse, simplify=TRUE))
-  dotsNames <- names(dotsAsCharacter)
-  if (is.null(dotsNames))
-    dotsNames <- rep("", length(dotsAsCharacter))
-
-  rv <- list()
-  if (!is.null(sys.call(which - 1L)))
-    rv$calling_function <- as.list(sys.call(which - 1L))[[1L]]
-  rv$current_function <- callerName
-  rv$current_formals <- formalArguments
-  rv$arguments <- as.list(unevaluated)
-  if (evaluate)
-    rv$evaluated <- lapply(unevaluated, eval)
   rv$as_character <- dotsAsCharacter
   rv$named_dots <- dotsNames
   whichDots <- which(formalArguments == "...")
@@ -240,6 +204,7 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     ## Return environment containing complete set of new arguments, including '...', for 'fun()'.
     evalEnv <- do.call(temp, argList)
 
+    browser()
     ## Evaluate the body of 'fun()' in the environment created.
     eval(body(fun), envir=evalEnv)
 
@@ -251,6 +216,101 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     variableNames <- variables
     if (!is.null(names(variables)))
       variableNames[names(variables) != ""] <- names(variables)[names(variables) != ""]
+
+    argEnv <- as.environment(argList[names(argList) != ""]) # Can only save named arguments.
+    if (!is.null(file_path)) {
+      if (save_) {
+        filePath <- file_path
+        if (timestamp)
+          filePath <- paste(file_path_sans_ext(file_path), do.call("make_current_timestamp", timestampArgs), sep='_') %_% '.' %_% file_ext(file_path)
+
+        if (verbose) cat("Saving data file \"" %_% filePath %_% "\".... ")
+        save(list=variables, file=filePath, envir=evalEnv)
+        if (copy_args)
+          append_rda(filePath, objects=ls(argEnv, all=TRUE), envir=argEnv)
+        if (verbose) { cat("Done.", fill=TRUE); flush.console() }
+      }
+    }
+
+    for (v in variables)
+      assign(v, get(v, envir=evalEnv), envir=envir)
+    if (copy_args) {
+      for (a in ls(argEnv, all=TRUE))
+        assign(a, get(a, envir=argEnv), envir=envir)
+    }
+
+    return (invisible(evalEnv))
+  }
+}
+
+
+#' @export
+cordon2 <- function(fun, ..., arguments=list(), envir=environment(), file_path=NULL, variables=NULL, copy_args=FALSE, timestamp=TRUE, timestamp...=list(), action=c("run", "save", "load", "skip", "archive"), evaluate_dots=FALSE, verbose=TRUE)
+{
+  action <- match.arg(action)
+  run_ <- action == "run" || action == "save" || action == "load"
+  save_ <- action == "save"
+  load_ <- action == "load"
+  archive_ <- action == "archive"
+
+  timestampArgs <- list(
+    use_seconds = TRUE,
+    seconds_sep = '+'
+  )
+  timestampArgs <- modifyList(timestampArgs, timestamp...)
+
+  if (archive_) {
+    if (is.null(file_path))
+      stop("Archive file path must be specified.")
+    if (!(file.info(file_path)$isdir)) file_path <- dirname(file_path)
+
+    if (verbose) cat("Loading archive file \"" %_% filePath %_% "\".... ")
+    archive("load", file_path) # 'archive()' not implemented yet.
+    if (verbose) { cat("Done.", fill=TRUE); flush.console() }
+  }
+  else if (load_) {
+    filePath <- file_path
+    if (timestamp) {
+      ## Get list of files in directory of 'file_path'.
+      fileExt <- file_ext(file_path)
+      dirName <- dirname(file_path)
+      timestampRe <- "_\\d{4}-\\d{2}-\\d{2}(?:\\" %_% timestampArgs$seconds_sep %_% "\\d{5})?"
+      ## Find all versions of the file according to their timestamp extensions.
+      filePaths <- sort(grep("^.*?" %_% timestampRe %_% "\\." %_% fileExt %_% "$", list.files(dirName, pattern="^" %_% file_path_sans_ext(basename(file_path)) %_% timestampRe %_% "\\." %_% fileExt %_% "$", full.names=FALSE), perl=TRUE, value=TRUE), decreasing=TRUE)
+      filePaths <- paste(dirName, filePaths, sep="/")
+      if (length(filePaths) > 0L)
+        ## Use the most recent version of the file according to its timestamp extension.
+        filePath <- filePaths[1L]
+    }
+
+    if (verbose) cat("Loading data file \"" %_% filePath %_% "\".... ")
+    load(file=filePath, envir=envir)
+    if (verbose) { cat("Done.", fill=TRUE); flush.console() }
+  }
+  else if (run_) {
+    evalEnv <- new.env()
+
+    dots <- get_dots(..., evaluate=evaluate_dots)
+    ## Add '...' arguments to argument list.
+    if (!evaluate_dots)
+      dotsArguments <- dots$arguments
+    else
+      dotsArguments <- dots$evaluated
+
+    argList <- modifyList(dotsArguments, arguments[names(arguments) != ""]) # Replace duplicate named arguments with those from 'arguments' and add new named arguments.
+    argList <- c(argList, arguments[names(arguments) == ""]) # Tack on unnamed arguments from 'arguments'.
+
+    tempFun <- fun
+    body(tempFun) <- as.call(c(as.name("{"), expression(return (environment()))))
+    ## Return environment containing complete set of new arguments, including '...', for 'fun()'.
+    evalEnv <- do.call(tempFun, argList)
+
+    ## Evaluate the body of 'fun()' in the environment created.
+    eval(body(fun), envir=evalEnv)
+
+    ## Pick out the variables to keep.
+    if (is.null(variables))
+      variables <- setdiff(ls(evalEnv, all=TRUE), c(names(formals(fun))))
 
     argEnv <- as.environment(argList[names(argList) != ""]) # Can only save named arguments.
     if (!is.null(file_path)) {
