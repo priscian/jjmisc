@@ -204,7 +204,6 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     ## Return environment containing complete set of new arguments, including '...', for 'fun()'.
     evalEnv <- do.call(temp, argList)
 
-    browser()
     ## Evaluate the body of 'fun()' in the environment created.
     eval(body(fun), envir=evalEnv)
 
