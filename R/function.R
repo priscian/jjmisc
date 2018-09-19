@@ -170,7 +170,7 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
       dirName <- dirname(file_path)
       timestampRe <- "_\\d{4}-\\d{2}-\\d{2}(?:\\" %_% timestampArgs$seconds_sep %_% "\\d{5})?"
       ## Find all versions of the file according to their timestamp extensions.
-      filePaths <- sort(grep("^.*?" %_% timestampRe %_% "\\." %_% fileExt %_% "$", list.files(dirName, pattern="^" %_% file_path_sans_ext(basename(file_path)) %_% timestampRe %_% "\\." %_% fileExt %_% "$", full.names=FALSE), perl=TRUE, value=TRUE), decreasing=TRUE)
+      filePaths <- sort(grep("^.*?" %_% timestampRe %_% "\\." %_% fileExt %_% "$", list.files(dirName, pattern="^" %_% Hmisc::escapeRegex(file_path_sans_ext(basename(file_path))) %_% timestampRe %_% "\\." %_% fileExt %_% "$", full.names=FALSE), perl=TRUE, value=TRUE), decreasing=TRUE)
       filePaths <- paste(dirName, filePaths, sep="/")
       if (length(filePaths) > 0L)
         ## Use the most recent version of the file according to its timestamp extension.
