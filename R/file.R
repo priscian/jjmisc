@@ -1,3 +1,43 @@
+## Allow renaming of objects before 'save()'ing them.
+## Expands on https://stackoverflow.com/questions/21248065/r-rename-r-object-while-save-ing-it/21248218#21248218
+#' @export
+saver <- function(..., file = stop("'file' must be specified"), save... = list(), evaluateDots = TRUE)
+{
+  d <- get_dots(..., evaluate = evaluateDots)
+  l <- d$arguments
+  if (evaluateDots)
+    l <- d$evaluated
+  if (is_invalid(names(l)))
+    names(l) <- ""
+  names(l)[names(l) == ""] <- sapply(d$arguments, toString)[names(l) == ""]
+
+  if (!is_invalid(save...$list)) {
+    e <- new.env()
+    dev_null <- sapply(save...$list, function(s) assign(s, get(s), envir = e))
+    dev_null <- NULL
+
+    l <- modifyList(l, as.list(e))
+    save...$list <- NULL
+  }
+
+  saveArgs = list(
+    list = names(l),
+    file = file,
+    #eval.promises = TRUE,
+    envir = list2env(l)
+  )
+  saveArgs <- modifyList(saveArgs, save...)
+
+  do.call("save", saveArgs)
+}
+## usage:
+# foo <- list(beast = 666, "test", 3.14)
+# frog <- "fish"
+# saver(bar = foo, frig = frog, file = "hi.RData")
+## Save object using the 'list' parameter of 'save()':
+# saver(moo = frog, save... = list(list = c("foo")), file = "hi2.RData")
+
+
 #' @export
 append_rda <- function(file_path, objects=character(), envir=parent.frame(), remove=FALSE, ...)
 {
