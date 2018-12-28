@@ -106,6 +106,7 @@ make_current_timestamp <- function(fmt="%Y-%m-%d", use_seconds=FALSE, seconds_se
   return (timestamp)
 }
 
+
 #' Evaluate Function inside an Environment and Extract and Save Any Useful Variables from Its Body
 #'
 #' Puts a function's body and its arguments into an environment for evaluation, and afterwards allows extraction of any variables from the body, not just a return value.

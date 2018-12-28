@@ -80,10 +80,31 @@ shift.data.frame <- function(x, i, ...)
 }
 
 
+#' @export
+chunk <- function(x, size, ...)
+  UseMethod("chunk")
+
+
 #'@export
-chunk <- function(x, size)
+chunk.default <- function(x, size, ...)
 {
   split(x, as.numeric(gl(length(x), size, length(x))))
+}
+
+
+#'@export
+chunk.data.frame <- function(x, size, ...)
+{
+  s <- chunk.default(seq(NROW(x)), size, ...)
+
+  sapply(s, function(y) x[y, ], simplify = FALSE)
+}
+
+
+#'@export
+chunk.matrix <- function(x, size, ...)
+{
+  chunk.data.frame(x, size, ...)
 }
 
 
