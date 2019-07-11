@@ -5,8 +5,8 @@ has_internet = function(hostname="www.google.com")
 }
 
 
-#' @export
-#' @importFrom BiocInstaller biocLite
+## #' @export
+## #' @importFrom BiocInstaller biocLite
 bioc_lite <- function(..., local_lib=FALSE)
 {
   if (exists("biocLite", envir=.GlobalEnv))
