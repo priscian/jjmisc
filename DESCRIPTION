@@ -1,12 +1,12 @@
 Package: jjmisc
 Title: Various R Functions to Aid Report Creation
-Version: 0.38.0
+Version: 0.39.0
 Authors@R: person("Jim", "Java", email = "priscian@gmail.com", role = c("aut", "cre"))
 Description: These are various R functions I've created to help me conduct analyses and create reports from them.
-Depends: R (>= 3.2.0), dtplyr, lubridate, tools, ggplot2, Hmisc, devEMF, stringr, reshape2
-Imports: gdata, gtools, pryr, BiocInstaller, RCurl, httr, digest, data.table, plyr
+Depends: R (>= 3.5.0), dtplyr, lubridate, tools, ggplot2, Hmisc, rms, devEMF, stringr, reshape2
+Imports: gdata, gtools, pryr, RCurl, httr, digest, data.table, plyr
 Suggests: knitr, testthat
 VignetteBuilder: knitr
 License: Artistic-2.0
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

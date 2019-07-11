@@ -140,7 +140,7 @@ make_current_timestamp <- function(fmt="%Y-%m-%d", use_seconds=FALSE, seconds_se
 #' }
 #'
 #' @export
-cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NULL, variables=NULL, copy_args=FALSE, timestamp=TRUE, timestamp...=list(), action=c("run", "save", "load", "skip", "archive"), evaluate_dots=TRUE, verbose=TRUE)
+cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NULL, variables=NULL, copy_args=FALSE, timestamp=TRUE, timestamp...=list(), action=c("run", "save", "load", "skip", "archive"), evaluate_dots=TRUE, create_path_dir=TRUE, verbose=TRUE)
 {
   action <- match.arg(action)
   run_ <- action == "run" || action == "save" || action == "load"
@@ -221,6 +221,10 @@ cordon <- function(fun, ..., arguments=list(), envir=environment(), file_path=NU
     if (!is.null(file_path)) {
       if (save_) {
         filePath <- file_path
+
+        if (create_path_dir && !dir.exists(dirname(file_path)))
+          dir.create(dirname(file_path), recursive = TRUE)
+
         if (timestamp)
           filePath <- paste(file_path_sans_ext(file_path), do.call("make_current_timestamp", timestampArgs), sep='_') %_% '.' %_% file_ext(file_path)
 

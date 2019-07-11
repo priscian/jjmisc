@@ -145,11 +145,13 @@ add_na <- function(x, ...)
 {
   x <- as.factor(x)
 
+  classes <- class(x)
   att <- attributes(x); att <- att[names(att) %nin% c("levels")] # Save object attributes.
 
   x <- addNA(x, ...)
 
   attributes(x) <- modifyList(attributes(x), att) # Restore object attributes.
+  class(x) <- unique(classes, c(class(x)))
 
   return (x)
 }
@@ -173,6 +175,7 @@ order_levels <- function(x, ..., index=FALSE, frequency=TRUE, decreasing=TRUE, o
 
   if (by_name) return (gdata::reorder.factor(x, ...))
 
+  classes <- class(x)
   att <- attributes(x); att <- att[names(att) %nin% c("levels")] # Save object attributes.
 
   l <- levels(x)
@@ -205,6 +208,7 @@ order_levels <- function(x, ..., index=FALSE, frequency=TRUE, decreasing=TRUE, o
     x <- addNA(x, ifany=ifany)
 
   attributes(x) <- modifyList(att, attributes(x)) # Restore object attributes.
+  class(x) <- unique(classes, c(class(x)))
 
   return (x)
 }

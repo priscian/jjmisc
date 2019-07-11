@@ -1,5 +1,311 @@
 #' @export
-surv_brief = function(f, x, survival_type="both", subset=NULL, summary...=NULL, survfit_frame...=FALSE)
+latex.coxph <- function(x, caption = NULL, label = NULL, digits = 3, frame_only = FALSE, ...)
+{ # V. http://stackoverflow.com/questions/7780666/cox-regression-output-in-xtable-choosing-rows-columns-and-adding-a-confidence
+  cox <- x
+
+  ## Prepare the columns.
+  beta <- coef(cox)
+  se <- sqrt(diag(cox$var))
+  p <- get_formatted_p_value(1 - pchisq((beta/se)^2, 1), le = "<")
+  ci <- exp(confint.default(cox))
+
+  ## Bind columns together and select desired rows.
+  res <- dataframe(beta, se = exp(beta), ci, p)
+  colnames(res) <- c("beta", "HR", colnames(ci), "\\(p\\)")
+
+  ## Print results in a LaTeX-ready form.
+  x <- xtable(res, caption = caption, label = label, digits = digits)
+
+  if (!frame_only)
+    print(x, booktabs = TRUE, sanitize.text.function = function(x) Hmisc::latexTranslate(x, pb = FALSE, greek = TRUE), math.style.negative = TRUE, table.placement = "H", caption.placement = "top", ...)
+  else
+    return(res)
+
+  return (nop())
+}
+
+
+#' @export
+latex.cph <- latex.coxph
+
+
+#' @export
+gcox <- function(f, p, survivalType = "both", subset = NULL, prefix = "c", model = TRUE, surv = TRUE, x = TRUE, y = TRUE, package = "both", ...)
+{
+  if (!is.list(f) && !inherits(f, "formula"))
+    stop("Function argument is not a list or a formula.")
+
+  if (!inherits(p, "pointer"))
+    stop("Function argument is not a pointer.")
+
+  temp <- NULL
+  for (i in survivalType) {
+    if (i == "both") temp <- c(temp, "pfs", "os")
+    else temp <- c(temp, i)
+  }
+  survivalType <- temp
+
+  useRms <- useSurvival <- FALSE
+  temp <- substring(trim(package), 1, 3)
+  if (temp == "bot")
+    useRms <- useSurvival <- TRUE
+  else if (temp == "rms")
+    useRms <- TRUE
+  else if (temp == "sur")
+    useSurvival <- TRUE
+
+  formulas <- list() # Or: 'structure(vector(mode = "list", length(survivalType)), names = survivalType)'
+  for (i in survivalType) {
+    if (inherits(f, "formula")) # Can't use 'ifelse()' here because of incompatible types.
+      formulas[[i]] <- f
+    else
+      formulas[[i]] <- f[[i]]
+
+    environment(formulas[[i]]) <- environment() # Need to change the formula's environment from 'R_GlobalEnv'.
+  }
+
+  .subset <- list()
+  if (!is.list(subset)) {
+    for (i in survivalType)
+      .subset[[i]] <- subset
+  }
+  else
+    .subset <- subset
+
+  modelFits <- list()
+
+  for (i in survivalType) {
+    survivalTypeAbbreviation <- substring(i, 1, 1)
+    survivalVariableNames <- paste(prefix, c("", "h"), survivalTypeAbbreviation, sep = "")
+
+    f <- eval(substitute(update(formulas[[i]], v ~ .), list(v = as.symbol(i))))
+    fh <- as.formula(gsub("strata\\(", "strat(", split(f)$as_character))
+    #browser()
+    if (useSurvival)
+      modelFits[[survivalVariableNames[1]]] <- coxph(f, data = ..(p), subset = .subset[[i]], model = model, x = x, y = y, ...)
+    if (useRms)
+      modelFits[[survivalVariableNames[2]]] <- cph(fh, data = ..(p), subset = .subset[[i]], model = model, surv = surv, x = x, y = y, ...)
+  }
+
+  class(modelFits) <- "gcox"
+
+  return (modelFits)
+}
+## usage:
+# gc1 <- gcox(f2, ptr(d), subset = list(pfs = keepRowsLandmarkPfs, os = keepRowsLandmarkOs))
+
+
+#' @export
+print.gcox <- function(x, confint = FALSE, survivalType = "both", tache = "#####", reps = 10, ...)
+{
+  op <- options("prType"); options(prType = NULL)
+
+  isCph <- logical(length(x))
+  for (i in 1:length(x)) {
+    if (inherits(x[[i]], "cph"))
+      isCph[i] <- TRUE
+  }
+
+  temp <- NULL
+  for (i in survivalType) {
+    if (i == "both") temp <- c(temp, "pfs", "os")
+    else temp <- c(temp, i)
+  }
+  survivalType <- temp
+  survivalTypeAbbreviation <- substring(survivalType, 1, 1)
+
+  if (all(isCph)) modelPrintNames <- names(x)
+  else modelPrintNames <- names(x)[!isCph]
+
+  for (i in modelPrintNames) {
+    if (str_sub(i, -1) %in% survivalTypeAbbreviation) { # Uses "stringr" package
+      catn(paste(rep(tache, reps), collapse = ""), suffix = "")
+      catn(tache, suffix = "")
+      catn(tache %_% " Model:", suffix = "")
+      form <- x[[i]]$formula
+      if (is.null(form)) form <- as.list(x[[i]]$model)$formula
+      catn(tache %_% " " %_% split(form)$as_character, suffix = "")
+      catn(tache, suffix = "\n")
+      catn(paste(rep(tache, reps), collapse = ""), prefix = "")
+      print(x[[i]])
+    }
+  }
+
+  anovaPrintNames <- names(x)[isCph]
+  for (i in anovaPrintNames) {
+    if (str_sub(i, -1) %in% survivalTypeAbbreviation) {
+      catn(paste(rep(tache, reps), collapse = ""), suffix = "")
+      catn(tache, suffix = "")
+      catn(tache %_% " Wald Tests:", suffix = "")
+      catn(tache %_% " " %_% split(as.list(x[[i]]$model)$formula)$as_character, suffix = "")
+      catn(tache, suffix = "\n")
+      catn(paste(rep(tache, reps), collapse = ""), prefix = "")
+      print(anova(x[[i]]))
+    }
+  }
+
+  if (confint) {
+    for (i in modelPrintNames) {
+      if (str_sub(i, -1) %in% survivalTypeAbbreviation) {
+        catn(paste(rep(tache, reps), collapse = ""), suffix = "")
+        catn(tache, suffix = "")
+        catn(tache %_% " Hazard Ratio & Confidence Intervals:", suffix = "")
+        form <- x[[i]]$formula
+        if (is.null(form)) form <- as.list(x[[i]]$model)$formula
+        catn(tache %_% " " %_% split(form)$as_character, suffix = "")
+        catn(tache, suffix = "\n")
+        catn(paste(rep(tache, reps), collapse = ""), prefix = "")
+        print(confint(x[[i]]))
+      }
+    }
+  }
+
+  options(op)
+
+  nop()
+}
+
+
+## Some notes on 'latex.gcox()'.
+#
+# The object 'gc7$cp' is a "coxph" model fit with parameter values 'model = TRUE, x = TRUE, y = TRUE' included.
+#
+# 'gc7$cp$model' or 'model.frame(gc7$cp)' returns the model frame, i.e. the relevant data frame with all in-formula operations performed on variables. For RMS models, use 'eval(gc7$chp$model)' (which seems like a hack, but whatever).
+#
+# all.vars(terms(gc7$cp)) # Basic names of predictor variables used in model
+# attr(terms(gc7$cp), "term.labels") # Labels of regressors in model fit
+# colnames(model.matrix(gc7$cp)) # Column names for all regressors in design matrix
+# gc7$cp$assign # Which columns from 'model.matrix(gc7$cp)' are used for each predictor; also, how many regressors used for each predictor
+# attr(terms(gc7$cp), "variables") # 'call' object; can use 'length()' and 'list' subsetting to extract names of predictor variables, but not needed
+# attr(terms(gc7$cp), "order") # Corresponds to "term.labels" above; value > 1 is an interaction term
+# attr(anova(gc7$chp), "coef.names")
+# attr(anova(gc7$chp), "which") # Regressors used in calculating Wald statistics of 'anova.rms()'
+
+#' @export
+latex.gcox <- function (x, survivalType = "both", prefix = "c", ...)
+{
+  temp <- NULL
+  for (i in survivalType) {
+    if (i == "both") temp <- c(temp, "pfs", "os")
+    else temp <- c(temp, i)
+  }
+  survivalType <- temp
+
+  for (i in survivalType) {
+    survivalTypeAbbreviation <- substring(i, 1, 1)
+    svn <- survivalVariableNames <- paste(prefix, c("", "h"), survivalTypeAbbreviation, sep = "")
+
+    specials <- as.vector(unlist(attr(terms(x[[svn[1]]]), "specials")))
+    factors <- attr(terms(x[[svn[1]]]), "factors")
+    allPredictors <- apply(factors, 1, function(a) { names(which(a > 0)) })
+    allRegressors <- sapply(allPredictors, function(a) { as.vector(unlist(x[[svn[1]]]$assign[a])) })
+    allRegressors <- allRegressors[!sapply(allRegressors, is.null)] # Handles all non-interaction terms
+    regressorOrder <- structure(attr(terms(x[[svn[1]]]), "order"), names = attr(terms(x[[svn[1]]]), "term.labels"))
+
+    allPredictors <- allPredictors[sapply(allPredictors, length) > 0]
+    allPredictorsRms <- sapply(allPredictors,
+      function(a1) {
+        sapply(a1,
+          function(a2) {
+            temp <- strsplit(a2, ":")[[1]]
+            temp <- sapply(temp, function(a3) { all.vars(as.formula("~" %_% a3)) })
+            paste(temp, collapse = " * ")
+          }
+        )
+      }
+    )
+
+    temp <- sort(unique(regressorOrder))
+    interactionLevels <- subset(temp, temp > 1) # Interactions have order > 1
+    interactionFactors <- factors[, regressorOrder %in% interactionLevels]
+    omnibusInteractionFactors <- list()
+    for (j in colnames(interactionFactors)) {
+      temp <- NULL
+      for (k in colnames(interactionFactors)) {
+        if (sum(bitAnd(interactionFactors[, j], interactionFactors[, k])) == sum(interactionFactors[, j]))
+          temp <- c(temp, k)
+      }
+      if (length(temp) > 0)
+        omnibusInteractionFactors[[j]] <- temp
+    }
+    wald <- suppressWarnings(anova(x[[svn[2]]]))
+    waldWhich <- attr(wald, "which")
+
+    for (j in names(omnibusInteractionFactors))
+      allRegressors[[j]] <- as.vector(unlist(x[[svn[1]]]$assign[omnibusInteractionFactors[[j]]]))
+
+    omnibusPValues <- sapply(allRegressors,
+      function(a) {
+        rv <- NULL
+        for (j in 1:length(waldWhich)) {
+          if (length(a) == length(waldWhich[[j]]) && a == waldWhich[[j]]) {
+            rv <- wald[j, "P"]
+            break
+          }
+        }
+
+        return (rv)
+      }
+    )
+
+    regressorVariablesRms <- sapply(names(allRegressors), function(a) { all.vars(as.formula("~" %_% a)) })
+    regressorVariablesRmsNames <- sapply(regressorVariablesRms, paste, collapse = " * ") # Also see 'gc7$chp$Design$name'
+
+    regressorVariables <- sapply(names(allRegressors), function(a) { strsplit(a, ":")[[1]] })
+
+    regressorLabels <- sapply(names(regressorVariables),
+      function(a) {
+        rv <- NULL
+        for (j in regressorVariables[[a]]) {
+          modelLabel <- label(x[[svn[1]]]$model[[j]])
+          rv <- c(rv, ifelse(is.null(modelLabel), j, modelLabel))
+        }
+        rv <- paste(rv, collapse = " * ")
+
+        return (rv)
+      }
+    )
+    regressorUnits <- sapply(names(regressorVariables),
+      function(a) {
+        rv <- NULL
+        if (length(regressorVariables[[a]]) > 1)
+          return (rv)
+        for (j in regressorVariables[[a]]) {
+          modelUnits <- units(x[[svn[1]]]$model[[j]])
+          rv <- c(rv, ifelse(is.null(modelUnits), j, modelUnits))
+        }
+
+        return (rv)
+      }
+    )
+
+    ## TODO: Use 'gc7$chp$Design$nonlinear'? Match booleans to 'gc7$chp$assign' via 'allPredictorsRms' and get the p-value from 'waldWhich' object?
+    nonlinears <- x[[svn[2]]]$Design$nonlinear
+    #nonlinears <- nonlinears[sapply(nonlinears, any)]
+
+    nonlinearPredictors <- sapply(names(allPredictorsRms),
+      function(a1) {
+        p <- allPredictorsRms[[a1]]
+        flags <- as.vector(sapply(p, function(a2) { nonlinears[[a2]] }))
+        indices <- as.vector(sapply(names(p), function(a2) { x[[svn[2]]]$assign[[a2]] }))
+
+        rv <- as.vector(unlist(indices)[unlist(flags)])
+        if (is.invalid(rv)) return (NA)
+
+        return (sort(rv))
+      }
+    )
+
+    #browser()
+  }
+
+  # x[[svn[1]]]$y[, "status"] # Survival event; may need 'as.vector()'ing
+  # x[[svn[1]]]$model$raceReduced # E.g.; model-variable values (no need to deal with 'subset's)
+}
+
+
+#' @export
+surv_brief <- function(f, x, survival_type="both", subset=NULL, summary...=NULL, survfit_frame...=FALSE)
 {
   p <- x
   if (!inherits(p, "pointer"))
